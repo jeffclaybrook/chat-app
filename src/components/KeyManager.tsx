@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { useUser } from "@clerk/nextjs"
-import { generateAndSaveKeypair } from "@/lib/encryption"
+import { generateAndSaveKeypair } from "@/utils/keys"
 import { savePublicKey } from "@/lib/actions/user"
 import { getSecretKey } from "@/utils/keys"
 import { useKeyStore } from "@/store/useKeyStore"
@@ -15,10 +15,10 @@ export default function KeyManager() {
   async function setupKeys() {
    if (!isLoaded || !user) return
 
-   const secretKey = getSecretKey()
+   const secretKey = await getSecretKey()
 
    if (!secretKey) {
-    const { publicKey } = generateAndSaveKeypair()
+    const { publicKey } = await generateAndSaveKeypair()
     await savePublicKey(publicKey)
     console.log("Generated new keypair and saved public key.")
    }

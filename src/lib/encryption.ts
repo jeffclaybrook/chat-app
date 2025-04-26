@@ -1,14 +1,5 @@
 import nacl from "tweetnacl"
 import * as naclUtil from "tweetnacl-util"
-import { saveSecretKey } from "@/utils/keys"
-
-export function generateKeyPair() {
- const keyPair = nacl.box.keyPair()
- return {
-  publicKey: naclUtil.encodeBase64(keyPair.publicKey),
-  secretKey: naclUtil.encodeBase64(keyPair.secretKey)
- }
-}
 
 export function encryptMessage({
  message,
@@ -56,14 +47,4 @@ export function decryptMessage({
   console.error("Decryption failed", error)
   return null
  }
-}
-
-export function generateAndSaveKeypair() {
- const keyPair = nacl.box.keyPair()
- const secretKey = naclUtil.encodeBase64(keyPair.secretKey)
- const publicKey = naclUtil.encodeBase64(keyPair.publicKey)
-
- saveSecretKey(secretKey)
-
- return { publicKey, secretKey }
 }

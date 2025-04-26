@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Mulish } from "next/font/google"
 import { ReactNode } from "react"
 import { ClerkProvider } from "@clerk/nextjs"
+import AuthListener from "@/components/AuthListener"
 import "./globals.css"
 
 const mulish = Mulish({
@@ -23,6 +24,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${mulish.variable} antialiased`}>
+          <AuthListener />
           {children}
         </body>
       </html>

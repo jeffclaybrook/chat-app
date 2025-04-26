@@ -4,9 +4,8 @@ import { useEffect, useState } from "react"
 import { redirect } from "next/navigation"
 import { useAuth } from "@clerk/nextjs"
 import { useConversationStore } from "@/store/useConversationStore"
-import { getSecretKey } from "@/utils/keys"
+import { ensureSecretKeyExists } from "@/utils/keys"
 import { useKeyStore } from "@/store/useKeyStore"
-import { generateAndSaveKeypair } from "@/lib/encryption"
 import ChatBox from "@/components/ChatBox"
 import KeyManager from "@/components/KeyManager"
 import Sidebar from "@/components/Sidebar"
@@ -21,14 +20,28 @@ export default function Chat() {
  useEffect(() => {
   if (!isLoaded || !userId) return
 
-  let key = getSecretKey()
-
-  if (!key) {
-   const generated = generateAndSaveKeypair()
-   key = generated.secretKey
+  async function ensureKeys() {
+   const key = await ensureSecretKeyExists()
+   setSenderSecretKey(key)
   }
 
-  setSenderSecretKey(key)
+  ensureKeys()
+ }, [isLoaded, userId])
+
+ useEffect(() => {
+  async function ensureUserInDatabase() {
+   if (!isLoaded || !userId) return
+
+   try {
+    await fetch("/api/users", {
+     method: "POST"
+    })
+   } catch (error) {
+    console.error("[ENSURE_USER_IN_DB_ERROR]", error)
+   }
+  }
+
+  ensureUserInDatabase()
  }, [isLoaded, userId])
 
  useEffect(() => {
