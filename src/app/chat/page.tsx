@@ -6,6 +6,7 @@ import { useAuth } from "@clerk/nextjs"
 import { useConversationStore } from "@/store/useConversationStore"
 import { getSecretKey } from "@/utils/keys"
 import { useKeyStore } from "@/store/useKeyStore"
+import { generateAndSaveKeypair } from "@/lib/encryption"
 import ChatBox from "@/components/ChatBox"
 import KeyManager from "@/components/KeyManager"
 import Sidebar from "@/components/Sidebar"
@@ -18,10 +19,16 @@ export default function Chat() {
  const setConversations = useConversationStore((s) => s.setConversations)
 
  useEffect(() => {
-  if (isLoaded && userId) {
-   const key = getSecretKey()
-   setSenderSecretKey(key)
+  if (!isLoaded || !userId) return
+
+  let key = getSecretKey()
+
+  if (!key) {
+   const generated = generateAndSaveKeypair()
+   key = generated.secretKey
   }
+
+  setSenderSecretKey(key)
  }, [isLoaded, userId])
 
  useEffect(() => {

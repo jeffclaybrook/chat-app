@@ -65,5 +65,5 @@ export function generateAndSaveKeypair() {
 
  saveSecretKey(secretKey)
 
- return { publicKey }
+ return { publicKey, secretKey }
 }
