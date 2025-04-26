@@ -99,7 +99,7 @@ export default function ChatBox({
   }, [])
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 space-y-2 sm:space-y-4 relative">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-400 text-cener mt-20">No messages yet. Start the conversation!</div>

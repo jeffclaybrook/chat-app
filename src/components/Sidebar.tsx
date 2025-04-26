@@ -1,36 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Menu, Plus, X } from "lucide-react"
+import { useState } from "react"
+import { Menu, X } from "lucide-react"
 import { useConversationStore } from "@/store/useConversationStore"
 import { Button } from "./ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 import ProfileMenu from "./ProfileMenu"
 
-type User = {
-  id: string
-  email: string
-  publicKey: string
-}
-
 export default function Sidebar() {
-  const { conversations, selectConversation, selectedConversation, startNewConversation } = useConversationStore()
-  const [allUsers, setAllUsers] = useState<User[]>([])
-  const [openNewChat, setOpenNewChat] = useState<boolean>(false)
+  const { conversations, selectConversation, selectedConversation } = useConversationStore()
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
-
-  useEffect(() => {
-    async function fetchUsers() {
-      try {
-        const res = await fetch("/api/users")
-        const data = await res.json()
-        setAllUsers(data)
-      } catch (error) {
-        console.error("[FETCH_USERS_ERROR]", error)
-      }
-    }
-    fetchUsers()
-  }, [])
 
   return (
     <>
@@ -55,41 +33,6 @@ export default function Sidebar() {
             <X className="h-5 w-5" />
           </Button>
         </div>
-        <Dialog open={openNewChat} onOpenChange={setOpenNewChat}>
-          <DialogTrigger asChild>
-            <Button className="w-full">
-              <Plus />
-              Start New Chat
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Select a user to chat with</DialogTitle>
-            </DialogHeader>
-            <div className="mt-4 space-y-2">
-              {allUsers.length > 0 ? (
-                allUsers.map((user) => (
-                  <Button
-                    key={user.id}
-                    variant="ghost"
-                    onClick={async () => {
-                      await startNewConversation({
-                        id: user.id,
-                        userName: user.email,
-                        userPublicKey: user.publicKey
-                      })
-                      setOpenNewChat(false)
-                    }}
-                  >
-                    {user.email}
-                  </Button>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm">No users found.</p>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
         <ul className="space-y-2 px-2">
           {conversations.map((conversation) => (
             <li key={conversation.id}>

@@ -7,6 +7,7 @@ import { useConversationStore } from "@/store/useConversationStore"
 import { ensureSecretKeyExists } from "@/utils/keys"
 import { useKeyStore } from "@/store/useKeyStore"
 import ChatBox from "@/components/ChatBox"
+import CreateChat from "@/components/CreateChat"
 import KeyManager from "@/components/KeyManager"
 import Sidebar from "@/components/Sidebar"
 
@@ -96,6 +97,7 @@ export default function Chat() {
      </div>
     </>
    )}
+   <CreateChat />
   </div>
  )
 }
