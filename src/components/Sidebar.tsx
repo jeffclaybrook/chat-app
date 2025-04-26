@@ -35,13 +35,15 @@ export default function Sidebar() {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        onClick={() => setSidebarOpen(true)}
-        className="absolute top-4 left-4 md:hidden z-50"
-      >
-        <Menu className="h-5 w-5" />
-      </Button>
+      <nav className="absolute top-0 left-0 w-full flex items-center p-4 z-30">
+        <Button
+          variant="ghost"
+          onClick={() => setSidebarOpen(true)}
+          className="md:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      </nav>
       <aside className={`fixed inset-y-0 left-0 z-40 w-64 overflow-y-auto bg-white dark:bg-gray-900 border-r transform transition-transform duration-300 ease-in-out p-4 md:relative md:translate-x-0 md:flex md:flex-col ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex items-center justify-between gap-4 mb-4">
           <ProfileMenu />
@@ -56,7 +58,7 @@ export default function Sidebar() {
         </div>
         <Dialog open={openNewChat} onOpenChange={setOpenNewChat}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="w-full">
               <Plus />
               Start New Chat
             </Button>
