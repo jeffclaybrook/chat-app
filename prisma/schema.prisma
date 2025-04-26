@@ -26,3 +26,11 @@ model Message {
   sender   User @relation("MessagesSent", fields: [senderId], references: [id])
   receiver User @relation("MessagesReceived", fields: [receiverId], references: [id])
 }
+
+model Conversation {
+  id            String   @id @default(cuid())
+  userId        String
+  userName      String
+  userPublicKey String
+  createdAt     DateTime @default(now())
+}

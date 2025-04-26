@@ -11,25 +11,37 @@ import KeyManager from "@/components/KeyManager"
 import Sidebar from "@/components/Sidebar"
 
 export default function Chat() {
- const { userId } = useAuth()
+ const { userId, isLoaded } = useAuth()
  const { selectedConversation } = useConversationStore()
  const { keysLoading } = useKeyStore()
  const [senderSecretKey, setSenderSecretKey] = useState<string | null>(null)
  const setConversations = useConversationStore((s) => s.setConversations)
 
  useEffect(() => {
-  const key = getSecretKey()
-  setSenderSecretKey(key)
- }, [])
+  if (isLoaded && userId) {
+   const key = getSecretKey()
+   setSenderSecretKey(key)
+  }
+ }, [isLoaded, userId])
 
  useEffect(() => {
-  async function fetchConvos() {
-   const res = await fetch("/api/conversations")
-   const data = await res.json()
-   setConversations(data)
+  if (isLoaded && userId) {
+   async function fetchConvos() {
+    const res = await fetch("/api/conversations")
+    const data = await res.json()
+    setConversations(data)
+   }
+   fetchConvos()
   }
-  fetchConvos()
- }, [setConversations])
+ }, [isLoaded, userId, setConversations])
+
+ if (!isLoaded) {
+  return (
+   <div className="flex items-center justify-center flex-1 h-screen">
+    <p className="text-gray-400 text-lg animate-pulse">Loading authentication...</p>
+   </div>
+  )
+ }
 
  if (!userId) {
   return redirect("/sign-in")
@@ -50,7 +62,7 @@ export default function Chat() {
        {selectedConversation ? (
         <ChatBox
          currentUserId={userId}
-         recipientId={selectedConversation.userId}
+         recipientId={selectedConversation.id}
          recipientName={selectedConversation.userName}
          recipientPublicKey={selectedConversation.userPublicKey}
          senderSecretKey={senderSecretKey}

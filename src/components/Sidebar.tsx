@@ -8,10 +8,15 @@ import { Button } from "./ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 import ProfileMenu from "./ProfileMenu"
 
+type User = {
+  id: string
+  userName: string
+  userPublicKey: string
+}
+
 export default function Sidebar() {
-  const { conversations, selectConversation, selectedConversation } = useConversationStore()
-  const [allUsers, setAllUsers] = useState<any[]>([])
-  const [showUsers, setShowUsers] = useState<boolean>(false)
+  const { conversations, selectConversation, selectedConversation, startNewConversation } = useConversationStore()
+  const [allUsers, setAllUsers] = useState<User[]>([])
   const [openNewChat, setOpenNewChat] = useState<boolean>(false)
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
 
@@ -47,7 +52,7 @@ export default function Sidebar() {
         </div>
         <Dialog open={openNewChat} onOpenChange={setOpenNewChat}>
           <DialogTrigger asChild>
-            <Button onClick={() => setShowUsers(!showUsers)}>
+            <Button>
               <Plus />
               Start New Chat
             </Button>
@@ -62,8 +67,8 @@ export default function Sidebar() {
                   <Button
                     key={user.id}
                     variant="ghost"
-                    onClick={() => {
-                      selectConversation(user)
+                    onClick={async () => {
+                      await startNewConversation(user)
                       setOpenNewChat(false)
                     }}
                   >
@@ -77,16 +82,16 @@ export default function Sidebar() {
           </DialogContent>
         </Dialog>
         <ul className="space-y-2 px-2">
-          {conversations.map((convo) => (
-            <li key={convo.id}>
+          {conversations.map((conversation) => (
+            <li key={conversation.id}>
               <Button
-                onClick={() => selectConversation(convo)}
-                className={`w-full text-start px-4 py-2 rounded ${selectedConversation?.id === convo.id
+                onClick={() => selectConversation(conversation)}
+                className={`w-full text-start px-4 py-2 rounded ${selectedConversation?.id === conversation.id
                     ? "bg-sky-500 text-white"
                     : "hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
               >
-                {convo.userName}
+                {conversation.userName}
               </Button>
             </li>
           ))}

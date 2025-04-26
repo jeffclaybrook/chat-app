@@ -3,48 +3,61 @@ import { auth } from "@clerk/nextjs/server"
 import prisma from "@/lib/prisma"
 
 export async function GET() {
- const { userId } = await auth()
+ try {
+  const { userId } = await auth()
 
- if (!userId) {
-  return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
- }
-
- const sentMessages = await prisma.message.findMany({
-  where: { senderId: userId },
-  select: { receiverId: true },
-  distinct: ["receiverId"]
- })
-
- const receivedMessages = await prisma.message.findMany({
-  where: { receiverId: userId },
-  select: { senderId: true },
-  distinct: ["senderId"]
- })
-
- const contactIds = new Set<string>()
-
- sentMessages.forEach((m) => contactIds.add(m.receiverId))
- receivedMessages.forEach((m) => contactIds.add(m.senderId))
-
- contactIds.delete(userId)
-
- const contacts = await prisma.user.findMany({
-  where: {
-   id: { in: Array.from(contactIds) }
-  },
-  select: {
-   id: true,
-   publicKey: true,
-   email: true
+  if (!userId) {
+   return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
- })
 
- const formatted = contacts.map((user) => ({
-  id: user.id,
-  userId: user.id,
-  userName: user.email,
-  userPublicKey: user.publicKey
- }))
+  const conversations = await prisma.conversation.findMany({
+   where: {
+    userId: userId
+   },
+   orderBy: {
+    createdAt: "desc"
+   },
+   select: {
+    id: true,
+    userName: true,
+    userPublicKey: true,
+    createdAt: true
+   }
+  })
 
- return NextResponse.json(formatted)
+  return NextResponse.json(conversations)
+ } catch (error) {
+  console.error("[CONVERSATIONS_GET_ERROR]", error)
+  return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+ }
+}
+
+export async function POST(req: Request) {
+ try {
+  const { userId } = await auth()
+
+  if (!userId) {
+   return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const body = await req.json()
+  const { userName, userPublicKey } = body
+
+  if (!userName || !userPublicKey) {
+   return NextResponse.json({ error: "Missing fields" }, { status: 400 })
+  }
+
+  const conversation = await prisma.conversation.create({
+   data: {
+    userId,
+    userName,
+    userPublicKey
+   }
+  })
+
+  return NextResponse.json(conversation)
+ } catch (error) {
+  console.error("[CONVERSATIONS_POST_ERROR]", error)
+  return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+ }
 }

@@ -11,6 +11,10 @@ const pusher = new Pusher({
  useTLS: true
 })
 
+export async function GET() {
+ return NextResponse.json({ message: "Messages endpoint: POST only" })
+}
+
 export async function POST(req: Request) {
  const { userId } = await auth()
 
