@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { redirect } from "next/navigation"
 import { useAuth } from "@clerk/nextjs"
 import { useConversationStore } from "@/store/useConversationStore"
@@ -14,8 +14,13 @@ export default function Chat() {
  const { userId } = useAuth()
  const { selectedConversation } = useConversationStore()
  const { keysLoading } = useKeyStore()
- const senderSecretKey = getSecretKey()
+ const [senderSecretKey, setSenderSecretKey] = useState<string | null>(null)
  const setConversations = useConversationStore((s) => s.setConversations)
+
+ useEffect(() => {
+  const key = getSecretKey()
+  setSenderSecretKey(key)
+ }, [])
 
  useEffect(() => {
   async function fetchConvos() {
@@ -33,7 +38,7 @@ export default function Chat() {
  return (
   <div className="flex h-screen">
    <KeyManager />
-   {keysLoading || !senderSecretKey ? (
+   {keysLoading || senderSecretKey === null ? (
     <div className="flex items-center justify-center flex-1">
      <div className="text-gray-400 text-lg animate-pulse">Loading encryption keys...</div>
     </div>
