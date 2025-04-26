@@ -10,8 +10,8 @@ import ProfileMenu from "./ProfileMenu"
 
 type User = {
   id: string
-  userName: string
-  userPublicKey: string
+  email: string
+  publicKey: string
 }
 
 export default function Sidebar() {
@@ -22,9 +22,13 @@ export default function Sidebar() {
 
   useEffect(() => {
     async function fetchUsers() {
-      const res = await fetch("/api/users")
-      const data = await res.json()
-      setAllUsers(data)
+      try {
+        const res = await fetch("/api/users")
+        const data = await res.json()
+        setAllUsers(data)
+      } catch (error) {
+        console.error("[FETCH_USERS_ERROR]", error)
+      }
     }
     fetchUsers()
   }, [])
@@ -68,11 +72,15 @@ export default function Sidebar() {
                     key={user.id}
                     variant="ghost"
                     onClick={async () => {
-                      await startNewConversation(user)
+                      await startNewConversation({
+                        id: user.id,
+                        userName: user.email,
+                        userPublicKey: user.publicKey
+                      })
                       setOpenNewChat(false)
                     }}
                   >
-                    {user.userName}
+                    {user.email}
                   </Button>
                 ))
               ) : (

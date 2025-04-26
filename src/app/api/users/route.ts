@@ -11,26 +11,19 @@ export async function GET() {
 
  const users = await prisma.user.findMany({
   where: {
-   id: {
-    not: userId
+   NOT: {
+    id: userId
    }
   },
   select: {
    id: true,
-   email: true,
-   publicKey: true
+   publicKey: true,
+   email: true
   },
   orderBy: {
    email: "asc"
   }
  })
 
- const formatted = users.map((user) => ({
-  id: user.id,
-  userId: user.id,
-  userName: user.email,
-  userPublicKey: user.publicKey
- }))
-
- return NextResponse.json(formatted)
+ return NextResponse.json(users)
 }
